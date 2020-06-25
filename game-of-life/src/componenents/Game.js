@@ -112,8 +112,20 @@ const Game = props => {
         //implements double buffer where arr is the current buffer and arrCopy is the next
         let neighbors = 0;
         operations.forEach(([row, col]) => {
-            const neighborRowIndex = current_row + row;
-            const neighborColIndex = current_col + col;
+            let neighborRowIndex = current_row + row;
+            if(neighborRowIndex === -1){
+                neighborRowIndex = numRows -1
+            }
+            if(neighborRowIndex === numRows){
+                neighborRowIndex = 0
+            }
+            let neighborColIndex = current_col + col;
+            if(neighborColIndex === -1){
+                neighborColIndex = numCols -1
+            }
+            if(neighborColIndex === numCols){
+                neighborColIndex = 0
+            }
             if (neighborRowIndex >= 0 && neighborRowIndex < numRows & neighborColIndex >= 0 && neighborColIndex < numCols) {
                 neighbors += arr[neighborRowIndex][neighborColIndex];
             }
@@ -188,7 +200,7 @@ const Game = props => {
     }
 
 
-    console.log(randomGrid)
+    console.log(grid)
     return (
         <div className="grid-container" >
             <div

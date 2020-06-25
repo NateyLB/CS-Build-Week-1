@@ -15,6 +15,7 @@ const Rules = props =>{
                     <li>Any live cell with two or three live neighbours lives on to the next generation.</li>
                     <li>Any live cell with more than three live neighbours dies, as if by overpopulation.</li>
                     <li>Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.</li>
+                    <li>Lives cells "wrap" around their environment and continue through to the other side.</li>
                 </ul>
             </div>
         </div>
