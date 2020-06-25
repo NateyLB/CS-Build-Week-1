@@ -17,7 +17,7 @@ const About = props =>{
                 <li>The rules should be as simple as possible, whilst adhering to the above constraints.</li>
             </ul>
             <p>While the rules are very simple, the game is actually Turing Complete. It can simulate a Turing Machine, anything that can be 
-                computed algorithmically can be computed in the game of life (you could build a calculator or even build Conway's Game of Life in Conway's 
+                computed algorithmically can be computed in the Game of Life (you could build a calculator or even build Conway's Game of Life in Conway's 
                 Game of Life).
             </p>
         </div>
