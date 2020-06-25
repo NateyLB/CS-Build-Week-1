@@ -184,7 +184,7 @@ const Game = props => {
                 <form>
                             <input type="text" name="color" placeholder="live cell color" onChange={changeHandler}/>
                             <input type ="number" name="size" placeholder="size of cells" step="1" min="1" onChange={changeHandler}/>
-                            <input type="number" name="speed" placeholder="decrease speed by 1/100th /s" step="1" min="1" onChange={changeHandler}/>
+                            <input type="number" name="speed" placeholder="decrease speed" step="1" min="1" onChange={changeHandler}/>
                             <input type="number" name="generations" placeholder="go forward generations" step="1" min="1" onChange={changeHandler}/>
                             <button onClick={event=>{skipGenerations(event,options.generations)}}> Skip Generations</button>                
                 </form>
