@@ -1,25 +1,25 @@
-import React, { useState, useRef} from 'react';
-import  produce from 'immer'
+import React, { useState, useRef } from 'react';
+import produce from 'immer'
 
 let numRows = 40;
 let numCols = 80;
 const operations = [
-    [0,-1],
-    [0,1],
-    [-1,0],
-    [1,0],
-    [-1,-1],
-    [-1,1],
+    [0, -1],
+    [0, 1],
+    [-1, 0],
+    [1, 0],
+    [-1, -1],
+    [-1, 1],
     [1, 1],
     [1, -1]
 ];
 
-const blankGrid =[]
+const blankGrid = []
 for (let i = 0; i < numRows; i++) {
     blankGrid.push(Array.from(Array(numCols), () => 0))
 }
 
-const randomGrid =[]
+const randomGrid = []
 for (let i = 0; i < numRows; i++) {
     randomGrid.push(Array.from(Array(numCols), () => Math.round(Math.random())))
 }
@@ -68,11 +68,11 @@ const Game = props => {
         numCols: 80,
         size: 15,
         color: 'red',
-        generations:0
+        generations: 0
     })
     const speedRef = useRef(options.speed);
     speedRef.current = options.speed;
-    
+
 
     const toggleSquare = (rowIndex, colIndex) => {
         let gridCopy = JSON.parse(JSON.stringify(grid));
@@ -86,7 +86,7 @@ const Game = props => {
         return grid.map((row, rowIndex) => (
             row.map((square, colIndex) => (
                 <div
-                    onClick={() => toggleSquare(rowIndex,colIndex)}
+                    onClick={() => toggleSquare(rowIndex, colIndex)}
                     key={`${rowIndex} - ${colIndex}`}
                     style={{
                         width: options.size,
@@ -98,7 +98,44 @@ const Game = props => {
             ))
         ))
     };
-    const game = () => { 
+    const traverseMatrix = (arr, current_row, current_col, arrCopy) => {
+        
+        // If the entire column is traversed  
+        if (current_col >= numCols) {
+            return 0;
+        }
+        // If the entire row is traversed  
+        if (current_row >= numRows) {
+            return 1;
+        }
+        //check neighbors of cell and calculate if it stays alive or not
+        //implements double buffer where arr is the current buffer and arrCopy is the next
+        let neighbors = 0;
+        operations.forEach(([row, col]) => {
+            const neighborRowIndex = current_row + row;
+            const neighborColIndex = current_col + col;
+            if (neighborRowIndex >= 0 && neighborRowIndex < numRows & neighborColIndex >= 0 && neighborColIndex < numCols) {
+                neighbors += arr[neighborRowIndex][neighborColIndex];
+            }
+        });
+
+        if (neighbors < 2 || neighbors > 3) {
+            arrCopy[current_row][current_col] = 0;
+        } else if (arr[current_row][current_col] === 0 && neighbors === 3) {
+            arrCopy[current_row][current_col] = 1;
+        }
+
+        // Recursive call to traverse the matrix  
+        // in the Horizontal direction  
+        if (traverseMatrix(arr, current_row, current_col + 1, arrCopy) === 1) {
+            return 1;
+        }
+
+        // Recursive call for changing the  
+        // Row of the matrix  
+        return traverseMatrix(arr, current_row + 1, 0, arrCopy);
+    }
+    const game = () => {
         // setGrid(currentGrid =>{
         //     let  newGrid = JSON.parse(JSON.stringify(grid))
         //     for( let rowIndex = 0; rowIndex < numRows; rowIndex++){
@@ -120,85 +157,70 @@ const Game = props => {
         //     }; 
         //     return newGrid
         // })        
-            setGrid(currentGrid => {
-                return produce(currentGrid, gridCopy => {
-                  for (let rowIndex = 0; rowIndex < numRows; rowIndex++) {
-                    for (let colIndex = 0; colIndex < numCols; colIndex++) {
-                      let neighbors = 0;
-                      operations.forEach(([row, col]) => {
-                        const neighborRowIndex = rowIndex + row;
-                        const neighborColIndex = colIndex + col;
-                        if ( neighborRowIndex >= 0 && neighborRowIndex < numRows & neighborColIndex >= 0 && neighborColIndex < numCols) {
-                          neighbors += currentGrid[neighborRowIndex][neighborColIndex];
-                        }
-                      });
-          
-                      if (neighbors < 2 || neighbors > 3) {
-                        gridCopy[rowIndex][colIndex] = 0;
-                      } else if (currentGrid[rowIndex][colIndex] === 0 && neighbors === 3) {
-                        gridCopy[rowIndex][colIndex] = 1;
-                      }
-                    }
-                  }
-                });
-              });
-        }
-    
-    const playGame = () =>{
+        setGrid(currentGrid => {
+            return produce(currentGrid, gridCopy => {
+                traverseMatrix(currentGrid,0,0, gridCopy)
+            });
+        });
+    }
+
+    const playGame = () => {
         console.log(runningRef.current, "inside")
-        if(!runningRef.current){
+        if (!runningRef.current) {
             return
         }
         game()
         setTimeout(playGame, speedRef.current * 10)
     }
-    const changeHandler = event =>{
+    const changeHandler = event => {
         setOptions({
             ...options,
-            [event.target.name]: event.target.name == "color" ? event.target.value : parseInt(event.target.value)
+            [event.target.name]: event.target.name === "color" ? event.target.value : parseInt(event.target.value)
         })
     }
 
-    const skipGenerations = (event,num) =>{
+    const skipGenerations = (event, num) => {
         event.preventDefault()
         console.log(num)
-        for(let i = 0; i < num; i++){
+        for (let i = 0; i < num; i++) {
             game()
         }
     }
+
+
     console.log(randomGrid)
     return (
         <div className="grid-container" >
-        <div
-            style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${numCols}, ${options.size}px)`
-        }}>
-            {createGrid()}
-        </div>
+            <div
+                style={{
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${numCols}, ${options.size}px)`
+                }}>
+                {createGrid()}
+            </div>
             <div id="presets">
-                <button onClick = {()=>setGrid(pulsar)}>Pulsar</button>
-                <button onClick ={()=>setGrid(gospersGliderGun)}> Gosper's Glider Gun</button>
-                <button onClick ={()=>setGrid(oscillators)}>Oscillators</button>
-                <button onClick ={()=>setGrid(randomGrid)}>Random</button>
+                <button onClick={() => setGrid(pulsar)}>Pulsar</button>
+                <button onClick={() => setGrid(gospersGliderGun)}> Gosper's Glider Gun</button>
+                <button onClick={() => setGrid(oscillators)}>Oscillators</button>
+                <button onClick={() => setGrid(randomGrid)}>Random</button>
                 <form>
-                            <input type="text" name="color" placeholder="live cell color" onChange={changeHandler}/>
-                            <input type ="number" name="size" placeholder="size of cells" step="1" min="1" onChange={changeHandler}/>
-                            <input type="number" name="speed" placeholder="decrease speed" step="1" min="1" onChange={changeHandler}/>
-                            <input type="number" name="generations" placeholder="forward generations" step="1" min="1" onChange={changeHandler}/>
-                            <button onClick={event=>{skipGenerations(event,options.generations)}}> Skip Generations</button>                
+                    <input type="text" name="color" placeholder="live cell color" onChange={changeHandler} />
+                    <input type="number" name="size" placeholder="size of cells" step="1" min="1" onChange={changeHandler} />
+                    <input type="number" name="speed" placeholder="decrease speed" step="1" min="1" onChange={changeHandler} />
+                    <input type="number" name="generations" placeholder="forward generations" step="1" min="1" onChange={changeHandler} />
+                    <button onClick={event => { skipGenerations(event, options.generations) }}> Skip Generations</button>
                 </form>
-                            <button onClick={()=>setGrid(blankGrid)}>Clear Grid</button>
-                            <button onClick = {game}>{"1 Frame ->"}</button>
-                <button onClick={()=>{
+                <button onClick={() => setGrid(blankGrid)}>Clear Grid</button>
+                <button onClick={game}>{"1 Frame ->"}</button>
+                <button onClick={() => {
                     setRunning(!running);
-                    if(!running){
+                    if (!running) {
                         console.log(runningRef)
                         runningRef.current = true;
                         playGame()
                     }
-                    
-                }}>{running ? "Stop!": "Start!"}</button>
+
+                }}>{running ? "Stop!" : "Start!"}</button>
             </div>
         </div>
     )
