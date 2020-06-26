@@ -63,7 +63,7 @@ const Game = props => {
     const runningRef = useRef(running);
     runningRef.current = running;
     const [options, setOptions] = useState({
-        speed: 1,
+        speed: 50,
         numRows: 40,
         numCols: 80,
         size: 15,
@@ -182,7 +182,7 @@ const Game = props => {
             return
         }
         game()
-        setTimeout(playGame, speedRef.current * 10)
+        setTimeout(playGame, speedRef.current * 1)
     }
     const changeHandler = event => {
         setOptions({
@@ -200,7 +200,7 @@ const Game = props => {
     }
 
 
-    console.log(grid)
+    console.log(options)
     return (
         <div className="grid-container" >
             <div
@@ -216,11 +216,23 @@ const Game = props => {
                 <button onClick={() => setGrid(oscillators)}>Oscillators</button>
                 <button onClick={() => setGrid(randomGrid)}>Random</button>
                 <form>
-                    <input type="text" name="color" placeholder="live cell color" onChange={changeHandler} />
-                    <input type="number" name="size" placeholder="size of cells" step="1" min="1" onChange={changeHandler} />
-                    <input type="number" name="speed" placeholder="decrease speed" step="1" min="1" onChange={changeHandler} />
-                    <input type="number" name="generations" placeholder="forward generations" step="1" min="1" onChange={changeHandler} />
+                    <label htmlFor="color">
+                        Color of Live Cells:
+                    <input type="text" name="color" placeholder="live cell color" value={options.color} onChange={changeHandler} />
+                    </label>
+                    <label htmlFor="size">
+                        Size of Cells:
+                    <input type="number" name="size" placeholder="size of cells" step="1" min="1" value={options.size} onChange={changeHandler} />
+                    </label>
+                    <label htmlFor="speed">
+                        Speed of Simulation:
+                    <input type="range" name="speed" min="1" max="100" value="10"step="1" value={options.speed} onChange={changeHandler} style={{direction:"rtl"}}/>
+                    </label>
+                    <label htmlFor="generations">
+                        Skip Forward Generations:
+                    <input type="number" name="generations" placeholder="forward generations" step="1" min="1" value={options.generations} onChange={changeHandler} />
                     <button onClick={event => { skipGenerations(event, options.generations) }}> Skip Generations</button>
+                    </label>
                 </form>
                 <button onClick={() => setGrid(blankGrid)}>Clear Grid</button>
                 <button onClick={game}>{"1 Frame ->"}</button>
